@@ -71,7 +71,7 @@ class Ellipsoid() {
         }
 
         var hasCollided = false
-        var collisionPoint = Vector3()
+        val collisionPoint = Vector3()
         var t = 1f
 
         if (!embeddedInPlane) {
@@ -193,6 +193,5 @@ class Ellipsoid() {
     fun checkTriangleBack(tri: Tri) {
         if (!tri.isFrontFacingTo(normalizedVelocity)) checkTriangle(tri)
     }
-
     
 }

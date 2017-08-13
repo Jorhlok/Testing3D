@@ -193,5 +193,10 @@ class Ellipsoid() {
     fun checkTriangleBack(tri: Tri) {
         if (!tri.isFrontFacingTo(normalizedVelocity)) checkTriangle(tri)
     }
-    
+
+    fun R3toE3() {
+        basePoint.set(R3Position).scl(eRadius)
+        velocity.set(R3Velocity).scl(eRadius)
+        normalizedVelocity.set(velocity).nor()
+    }
 }

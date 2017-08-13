@@ -2,6 +2,7 @@ package net.jorhlok.testing3d
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.PerspectiveCamera
@@ -23,9 +24,11 @@ class MyGdxGame : ApplicationAdapter() {
     var assets: AssetManager? = null
     var instances = Array<ModelInstance>()
     var loading: Boolean = false
-    var data = ""
+    val data = ""
 
-    var terrain = TriSoup()
+    val terrain = TriSoup()
+    val ellipsoid = Ellipsoid()
+    var ellipsoidInstance: ModelInstance? = null
 
     override fun create() {
         modelBatch = ModelBatch()
@@ -51,12 +54,68 @@ class MyGdxGame : ApplicationAdapter() {
         loading = true
 
         terrain.FromJSONFile("sampleterraintri.g3dj")
+
+//        val tri = Tri(Vector3(0f,2f,0f),Vector3(1f,0f,0f),Vector3(-1f,0f,0f))
+//        System.out.println(tri.checkPointInside(Vector3(0f,0f,0f)))     //false
+//        System.out.println(tri.checkPointInside(Vector3(0f,1f,0f)))     //true
+//        System.out.println(tri.checkPointInside(Vector3(0f,-1f,0f)))    //false
+//        System.out.println(tri.checkPointInside(Vector3(0f,2f,0f)))     //true
+//        System.out.println(tri.checkPointInside(Vector3(0f,3f,0f)))     //false
+//        System.out.println(tri.checkPointInside(Vector3(0f,1f,-1f)))    //true
+//        System.out.println(tri.checkPointInside(Vector3(0f,1f,1f)))     //true
+//        System.out.println(tri.checkPointInside(Vector3(-2f,0f,0f)))    //false
+//        System.out.println(tri.checkPointInside(Vector3(-1f,0f,0f)))    //false
+//        System.out.println(tri.checkPointInside(Vector3(1f,0f,0f)))     //false
+//        System.out.println(tri.checkPointInside(Vector3(2f,0f,0f)))     //false
+
+        ellipsoid.eRadius.set(1f,2f,1f)
     }
 
     override fun render() {
         if (loading && assets!!.update())
             doneLoading()
         camController!!.update()
+
+        val deltatime = Gdx.graphics.deltaTime
+
+        ellipsoid.R3Velocity.set(0f,0f,0f)
+        ellipsoid.foundCollision = false
+
+        val sp = 4f
+//        if (Gdx.input.isKeyPressed(Input.Keys.ENTER))
+        if (Gdx.input.isKeyPressed(Input.Keys.I))
+            ellipsoid.R3Velocity.z = sp
+
+        if (Gdx.input.isKeyPressed(Input.Keys.K))
+            ellipsoid.R3Velocity.z = -sp
+
+        if (Gdx.input.isKeyPressed(Input.Keys.J))
+            ellipsoid.R3Velocity.x = sp
+
+        if (Gdx.input.isKeyPressed(Input.Keys.L))
+            ellipsoid.R3Velocity.x = -sp
+
+        if (Gdx.input.isKeyPressed(Input.Keys.UP))
+            ellipsoid.R3Velocity.y = sp
+
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
+            ellipsoid.R3Velocity.y = -sp
+
+        ellipsoid.R3Velocity.scl(deltatime)
+        ellipsoid.R3toE3()
+
+        for (tri in terrain.soup) {
+            ellipsoid.checkTriangle(Tri(tri.p0.scl(ellipsoid.eRadius),tri.p1.scl(ellipsoid.eRadius),tri.p2.scl(ellipsoid.eRadius)))
+        }
+
+        if (ellipsoid.foundCollision) {
+            System.out.println("\n${ellipsoid.basePoint.toString()}")
+            System.out.println(ellipsoid.intersectionPoint.toString())
+            System.out.println(ellipsoid.nearestDistance)
+        }
+
+        ellipsoid.R3Position.add(ellipsoid.R3Velocity)
+        if(ellipsoidInstance != null) ellipsoidInstance!!.transform.setToTranslation(ellipsoid.R3Position)
 
         Gdx.gl.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
@@ -85,10 +144,11 @@ class MyGdxGame : ApplicationAdapter() {
 //            }
 //            x += 2f
 //        }
-        val terrain = assets!!.get(data + "sampleterraintri.g3dj", Model::class.java)
-        val ellipsoid = assets!!.get(data + "ellipsoid.g3dj", Model::class.java)
-        instances.add(ModelInstance(terrain))
-        instances.add(ModelInstance(ellipsoid))
+        val terrain1 = assets!!.get(data + "sampleterraintri.g3dj", Model::class.java)
+        val ellipsoid1 = assets!!.get(data + "ellipsoid.g3dj", Model::class.java)
+        instances.add(ModelInstance(terrain1))
+        ellipsoidInstance = ModelInstance(ellipsoid1)
+        instances.add(ellipsoidInstance)
         loading = false
     }
 }

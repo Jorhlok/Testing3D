@@ -28,12 +28,16 @@ class Tri(val p0: Vector3, val p1: Vector3, val p2: Vector3) {
 
         val d = vp.dot(e10)
         val e = vp.dot(e20)
-        val x = d*c-e*b
-        val y = e*a-d*b
+        val x = (d*c)-(e*b)
+        val y = (e*a)-(d*b)
         val z = x+y-ac_bb
 
         //C++ code is:
         //(uint32(z) & ~(uint32(x) | uint32(y))) & 0x80000000
-        return false //TODO : bitwise ops in Tri.checkPointInside()
+//        System.out.println("$x, $y, $z")
+        //the below two lines return differently
+//        return 0 != (z.toInt().and(x.toInt().or(y.toInt()))*-1-1).and(Int.MIN_VALUE)
+        return z<0 && (x>=0 || y>=0) //I think this is what it means, maybe
+
     }
 }

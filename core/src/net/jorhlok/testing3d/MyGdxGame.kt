@@ -81,8 +81,7 @@ class MyGdxGame : ApplicationAdapter() {
         ellipsoid.R3Velocity.set(0f,0f,0f)
         ellipsoid.foundCollision = false
 
-        val sp = 4f
-//        if (Gdx.input.isKeyPressed(Input.Keys.ENTER))
+        val sp = 8f
         if (Gdx.input.isKeyPressed(Input.Keys.I))
             ellipsoid.R3Velocity.z = sp
 
@@ -105,13 +104,14 @@ class MyGdxGame : ApplicationAdapter() {
         ellipsoid.R3toE3()
 
         for (tri in terrain.soup) {
-            ellipsoid.checkTriangle(Tri(tri.p0.scl(ellipsoid.eRadius),tri.p1.scl(ellipsoid.eRadius),tri.p2.scl(ellipsoid.eRadius)))
+            ellipsoid.checkTriangleFront(Tri(tri.p0.scl(ellipsoid.inverseERadius()),tri.p1.scl(ellipsoid.inverseERadius()),tri.p2.scl(ellipsoid.inverseERadius())))
         }
 
         if (ellipsoid.foundCollision) {
-            System.out.println("\n${ellipsoid.basePoint.toString()}")
-            System.out.println(ellipsoid.intersectionPoint.toString())
+            System.out.println("\n${ellipsoid.basePoint}")
+            System.out.println(ellipsoid.intersectionPoint)
             System.out.println(ellipsoid.nearestDistance)
+            ellipsoid
         }
 
         ellipsoid.R3Position.add(ellipsoid.R3Velocity)

@@ -31,7 +31,7 @@ class Ellipsoid() {
         if (determinant == 0f) {
             val r1 = -b / (2*a)
             if (r1 > 0 && r1 < maxR) return r1
-            else return -1f
+            return -1f
         }
 
         val sqrtD = Math.sqrt(determinant.toDouble()).toFloat()
@@ -156,7 +156,7 @@ class Ellipsoid() {
             }
 
             edge = tri.p0.cpy().sub(tri.p2)
-            baseToVertex = tri.p0.cpy().sub(basePoint)
+            baseToVertex = tri.p2.cpy().sub(basePoint)
             edgeSqrLen = edge.len2()
             edgeDotVelocity = edge.dot(velocity)
             edgeDotBaseToVertex = edge.dot(baseToVertex)
@@ -195,8 +195,10 @@ class Ellipsoid() {
     }
 
     fun R3toE3() {
-        basePoint.set(R3Position).scl(eRadius)
-        velocity.set(R3Velocity).scl(eRadius)
+        basePoint.set(R3Position).scl(inverseERadius())
+        velocity.set(R3Velocity).scl(inverseERadius())
         normalizedVelocity.set(velocity).nor()
     }
+
+    fun inverseERadius() = Vector3(1/eRadius.x,1/eRadius.y,1/eRadius.z)
 }

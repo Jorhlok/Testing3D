@@ -78,44 +78,40 @@ class MyGdxGame : ApplicationAdapter() {
 
         val deltatime = Gdx.graphics.deltaTime
 
-        ellipsoid.R3Velocity.set(0f,0f,0f)
+
+
+        ellipsoid.Velocity.set(0f,0f,0f)
         ellipsoid.foundCollision = false
 
         val sp = 8f
         if (Gdx.input.isKeyPressed(Input.Keys.I))
-            ellipsoid.R3Velocity.z = sp
+            ellipsoid.Velocity.z = sp
 
         if (Gdx.input.isKeyPressed(Input.Keys.K))
-            ellipsoid.R3Velocity.z = -sp
+            ellipsoid.Velocity.z = -sp
 
         if (Gdx.input.isKeyPressed(Input.Keys.J))
-            ellipsoid.R3Velocity.x = sp
+            ellipsoid.Velocity.x = sp
 
         if (Gdx.input.isKeyPressed(Input.Keys.L))
-            ellipsoid.R3Velocity.x = -sp
+            ellipsoid.Velocity.x = -sp
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP))
-            ellipsoid.R3Velocity.y = sp
+            ellipsoid.Velocity.y = sp
 
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-            ellipsoid.R3Velocity.y = -sp
+            ellipsoid.Velocity.y = -sp
 
-        ellipsoid.R3Velocity.scl(deltatime)
-        ellipsoid.R3toE3()
-
-        for (tri in terrain.soup) {
-            ellipsoid.checkTriangleFront(Tri(tri.p0.scl(ellipsoid.inverseERadius()),tri.p1.scl(ellipsoid.inverseERadius()),tri.p2.scl(ellipsoid.inverseERadius())))
-        }
-
-        if (ellipsoid.foundCollision) {
-            System.out.println("\n${ellipsoid.basePoint}")
+        if (ellipsoid.TriSoupSweptEllipsoidIntersect(terrain,deltatime)) {
+            System.out.println("\n${ellipsoid.Position}")
             System.out.println(ellipsoid.intersectionPoint)
             System.out.println(ellipsoid.nearestDistance)
-            ellipsoid
+            System.out.println(ellipsoid.translation)
         }
 
-        ellipsoid.R3Position.add(ellipsoid.R3Velocity)
-        if(ellipsoidInstance != null) ellipsoidInstance!!.transform.setToTranslation(ellipsoid.R3Position)
+
+        ellipsoid.Position.add(ellipsoid.Velocity.scl(deltatime))
+        if(ellipsoidInstance != null) ellipsoidInstance!!.transform.setToTranslation(ellipsoid.Position)
 
         Gdx.gl.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
